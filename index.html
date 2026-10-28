@@ -14,6 +14,7 @@ const $=id=>document.getElementById(id),makeId=()=>globalThis.crypto?.randomUUID
 let data;try{data=JSON.parse(localStorage.getItem(KEY))}catch{}
 if(!data||!Array.isArray(data.categories))data={categories:[{id:makeId(),name:'Food',koName:'음식',color:palette[0],words:[{id:makeId(),en:'Apple',ko:'사과',correct:0,wrong:0},{id:makeId(),en:'Grape',ko:'포도',correct:0,wrong:0},{id:makeId(),en:'Banana',ko:'바나나',correct:0,wrong:0}]}]};
 let active=null,quiz=[],index=0,correct=0,review=0,checked=false,mode='category',roundTotal=0,firstPassCorrect=0;
+let cloud=null,cloudUser=null,cloudLoading=false,cloudTimer=null,cloudWorking=false,cloudDirty=false,cloudSnapshot=new Map();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch{toast('Could not save. Check browser storage settings.')}if(cloudUser && !cloudLoading) queueCloudSync()};
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2700)}
 function show(page){['home','categoryPage','quizPage','backupPage','bulkPage','accountPage'].forEach(id=>$(id).classList.toggle('hidden',id!==page));window.scrollTo(0,0)}
@@ -61,7 +62,6 @@ data.categories.forEach(c=>{if(!c.koName&&c.name.toLowerCase()==='food')c.koName
 // Cloud bridge: public project URL + publishable client key. Never embed a secret key.
 const SUPABASE_URL='https://syattdkxyzhqwyckzcxl.supabase.co';
 const SUPABASE_PUBLIC_KEY='sb_publishable_wkFv078mCFvNG2ImXHwE8A_UlA50tOn';
-let cloud=null,cloudUser=null,cloudLoading=false,cloudTimer=null,cloudWorking=false,cloudDirty=false,cloudSnapshot=new Map();
 const pairKey=(en,ko)=>en.trim().toLocaleLowerCase()+'|'+ko.trim().normalize('NFC');
 function cloudMsg(m){$('cloudMessage').textContent=m;}
 function setCloudStatus(m){$('cloudStatus').textContent=m;}
